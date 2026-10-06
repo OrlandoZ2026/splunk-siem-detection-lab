@@ -76,6 +76,10 @@ index=wineventlog EventCode=4625
 
 **Alerting:** Saved as a scheduled alert on a `*/5 * * * *` cron schedule (every 5 minutes), triggering when results are greater than 0, with the "Add to Triggered Alerts" action so firings are logged for review.
 
+![Brute force detection](01-brute-force.png)
+
+![Alert configuration](05-alert-config.png)
+
 ## Detection 2: Encoded PowerShell (T1059.001)
 
 **Simulation (on the endpoint):**
@@ -92,12 +96,15 @@ index=wineventlog source="*Sysmon*" EventCode=1 Image="*powershell.exe" CommandL
 
 **Detection logic:** Attackers use PowerShell's `-EncodedCommand` flag to pass base64-encoded payloads, hiding the actual command from casual inspection and simple signature detection. Sysmon Event ID 1 (process creation) captures the full command line including the encoded blob, so filtering on `-enc` in the command line catches the technique regardless of payload. The detection surfaces who ran it, the parent process, and the encoded string for decoding during investigation.
 
+![Encoded PowerShell detection](02-encoded-powershell.png)
+
 ## Detection 3: Anomalous Outbound Connections (T1071)
 
 **Simulation (on the endpoint):**
 ```powershell
 Invoke-WebRequest https://example.com -UseBasicParsing
 ```
+![Anomalous outbound detection](03-anomalous-outbound.png)
 
 **Detection (SPL):**
 ```
@@ -115,6 +122,8 @@ A single dashboard combining the detections for at-a-glance monitoring:
 - **Brute Force Detection** — the clustered-failure table.
 - **Encoded PowerShell** — the T1059.001 catch.
 - **Anomalous Outbound Connections** — external connections by process.
+
+![Tier-1 triage dashboard](04-triage-dashboard.png)
 
 ## Troubleshooting Highlight: Sysmon Forwarding Failure (errorCode=5)
 
